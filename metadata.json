@@ -1,5 +1,5 @@
 {
-  "name": "Arch Linux AI Assistant",
+  "name": "LAhe",
   "description": "An AI-powered companion for Arch Linux users. Generate pacman commands, troubleshoot system issues, and analyze logs using natural language. Features a safety-first command verification system.",
   "requestFramePermissions": [],
   "majorCapabilities": []

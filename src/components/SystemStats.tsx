@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Cpu, HardDrive, Zap, Thermometer, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/src/lib/utils";

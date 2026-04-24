@@ -49,7 +49,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               className="font-bold text-lg tracking-tight whitespace-nowrap"
             >
-              Arch AI <span className="text-arch-blue">Assistant</span>
+              LA<span className="text-arch-blue">he</span>
             </motion.span>
           )}
         </div>

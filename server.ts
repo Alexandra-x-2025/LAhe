@@ -15,7 +15,7 @@ async function startServer() {
   const PORT = 3000;
 
   // Database initialization
-  const db = new Database("arch_assistant.db");
+  const db = new Database("lahe.db");
   db.exec(`
     CREATE TABLE IF NOT EXISTS interactions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

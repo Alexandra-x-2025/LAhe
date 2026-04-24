@@ -17,7 +17,7 @@ const translations: Translations = {
   "nav.stats": { en: "System Health", zh: "系统状态" },
   "nav.skills": { en: "Neural Map", zh: "神经图谱" },
   "nav.cron": { en: "Task Scheduler", zh: "任务调度" },
-  "nav.title": { en: "Arch AI Assistant", zh: "Arch AI 助手" },
+  "nav.title": { en: "LAhe", zh: "LAhe" },
   "nav.safety": { en: "Command Safety Active", zh: "命令安全检查已启用" },
 
   // Header

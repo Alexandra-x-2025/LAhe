@@ -9,7 +9,7 @@ import { useLanguage } from "@/src/lib/i18n";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const ARCH_SYSTEM_PROMPT = `You are the Arch Linux AI Assistant. Your goal is to help users manage their Arch Linux system.
+const ARCH_SYSTEM_PROMPT = `You are LAhe, an Arch Linux AI assistant. Your goal is to help users manage their Arch Linux system.
 Always provide commands using standard Arch Linux tools (pacman, systemctl, journalctl, ip, etc.).
 
 For every request that involves a command, you MUST return a response that includes one or more command blocks.
