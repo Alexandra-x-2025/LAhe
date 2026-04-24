@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-arch-blue: #1793d1;
+  --color-arch-dark: #0f1115;
+  --color-arch-surface: #161922;
+  --color-arch-surface-light: #1a1d26;
+  --color-arch-header: #11141d;
+  --color-arch-border: #1e293b;
+  --color-arch-text-primary: #e2e8f0;
+  --color-arch-text-secondary: #94a3b8;
+  --color-arch-text-muted: #64748b;
+}
+
+@layer base {
+  body {
+    @apply bg-arch-dark text-arch-text-primary antialiased font-sans;
+  }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background-color: var(--color-arch-blue);
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.sleek-border {
+  @apply border border-arch-border shadow-sm;
+}
+
+.sleek-card {
+  @apply bg-arch-surface border border-arch-border shadow-sm rounded-xl;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-arch-border rounded-full hover:bg-slate-700;
+}
