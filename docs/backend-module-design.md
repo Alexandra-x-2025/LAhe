@@ -139,7 +139,7 @@ export const config = {
   port: Number(process.env.PORT || 3000),
   databasePath: process.env.DATABASE_PATH || "lahe.db",
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
-  ollamaModel: process.env.OLLAMA_MODEL || "qwen2.5:7b",
+  ollamaModel: process.env.OLLAMA_MODEL || "qwen3.5:0.8b",
   nodeEnv: process.env.NODE_ENV || "development",
 };
 ```

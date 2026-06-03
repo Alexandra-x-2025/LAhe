@@ -106,7 +106,7 @@ LAhe MVP 默认使用 Ollama。
 
 ```env
 OLLAMA_BASE_URL="http://localhost:11434"
-OLLAMA_MODEL="qwen2.5:7b"
+OLLAMA_MODEL="qwen3.5:0.8b"
 ```
 
 调用流程：

@@ -17,7 +17,7 @@ LAhe 的技术选型围绕四个原则：
 - npm。
 - Git。
 - Ollama。
-- 至少一个本地模型，例如 `qwen2.5:7b`。
+- 至少一个本地模型，例如 `qwen3.5:0.8b`。
 
 Windows 上推荐：
 
@@ -95,14 +95,14 @@ MVP 使用 Ollama 本地模型。
 
 ```env
 OLLAMA_BASE_URL="http://localhost:11434"
-OLLAMA_MODEL="qwen2.5:7b"
+OLLAMA_MODEL="qwen3.5:0.8b"
 ```
 
 推荐模型：
 
 | 模型 | 说明 |
 | --- | --- |
-| `qwen2.5:7b` | 中文能力较好，适合默认开发测试 |
+| `qwen3.5:0.8b` | 中文能力较好，适合默认开发测试 |
 | `llama3.1:8b` | 英文能力较稳 |
 | `deepseek-r1:7b` | 适合推理型排障，但输出结构可能需要额外约束 |
 
@@ -190,7 +190,7 @@ Windows 下这些命令可能不可用，后端应返回降级结果。
 
 ```env
 OLLAMA_BASE_URL="http://localhost:11434"
-OLLAMA_MODEL="qwen2.5:7b"
+OLLAMA_MODEL="qwen3.5:0.8b"
 APP_URL="http://localhost:3000"
 ```
 
@@ -236,7 +236,7 @@ Ollama 验证：
 
 ```bash
 ollama --version
-ollama pull qwen2.5:7b
+ollama pull qwen3.5:0.8b
 ollama serve
 ```
 

@@ -56,7 +56,7 @@
 - Node.js 20 或更高版本
 - npm
 - Ollama
-- 本地模型，例如 `qwen2.5:7b`
+- 本地模型，例如 `qwen3.5:0.8b`
 - 推荐运行环境为 Linux / Arch Linux
 
 系统日志和状态接口依赖 `journalctl`、`uptime`、`free`、`df`、`top` 等 Linux 命令。在 Windows 或受限容器中运行时，部分系统信息会返回空值或降级提示。
@@ -79,14 +79,14 @@ cp .env.example .env.local
 
 ```env
 OLLAMA_BASE_URL="http://localhost:11434"
-OLLAMA_MODEL="qwen2.5:7b"
+OLLAMA_MODEL="qwen3.5:0.8b"
 APP_URL="http://localhost:3000"
 ```
 
 请确保 Ollama 已启动，并已拉取对应模型：
 
 ```bash
-ollama pull qwen2.5:7b
+ollama pull qwen3.5:0.8b
 ollama serve
 ```
 
