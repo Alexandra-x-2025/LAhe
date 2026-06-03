@@ -15,6 +15,7 @@ const translations: Translations = {
   "nav.history": { en: "Interaction History", zh: "交互记录" },
   "nav.logs": { en: "Journalctl Logs", zh: "系统日志" },
   "nav.stats": { en: "System Health", zh: "系统状态" },
+  "nav.audit": { en: "Command Audit", zh: "命令审计" },
   "nav.skills": { en: "Neural Map", zh: "神经图谱" },
   "nav.cron": { en: "Task Scheduler", zh: "任务调度" },
   "nav.title": { en: "LAhe", zh: "LAhe" },

@@ -1,5 +1,5 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="1200" height="475" alt="GHBanner" src="src\img\readlogo.png" />
 </div>
 
 # LAhe
@@ -10,8 +10,9 @@
 
 ## 功能特性
 
-- AI 命令中心：基于 Gemini API 回答 Arch Linux 运维问题，并生成 pacman、systemctl、journalctl 等常用命令。
+- AI 命令中心：基于本地 Ollama 模型回答 Arch Linux 运维问题，并生成 pacman、systemctl、journalctl 等常用命令。
 - 命令安全审计：AI 输出可携带 `[AUDIT]` 元数据，前端会解析命令、安全等级和说明，并在执行前展示确认区域。
+- 命令审计记录：保存命令执行和安全拦截记录，并在审计视图中展示最近记录。
 - 交互历史：将用户问题和 AI 回复保存到本地 SQLite 数据库。
 - 持久记忆与技能：支持保存 AI 识别出的记忆节点和复用型技能流程。
 - 系统日志查看：后端读取 `journalctl` 最近日志，前端提供过滤和展示界面。
@@ -23,7 +24,7 @@
 
 - 前端：React 19、Vite 6、TypeScript、Tailwind CSS 4、Motion、Lucide React
 - 后端：Express、better-sqlite3、tsx
-- AI：`@google/genai`
+- AI：Ollama 本地模型
 - 数据库：SQLite，默认文件为 `lahe.db`
 
 ## 项目结构
@@ -54,7 +55,8 @@
 
 - Node.js 20 或更高版本
 - npm
-- Gemini API Key
+- Ollama
+- 本地模型，例如 `qwen2.5:7b`
 - 推荐运行环境为 Linux / Arch Linux
 
 系统日志和状态接口依赖 `journalctl`、`uptime`、`free`、`df`、`top` 等 Linux 命令。在 Windows 或受限容器中运行时，部分系统信息会返回空值或降级提示。
@@ -73,11 +75,19 @@ npm install
 cp .env.example .env.local
 ```
 
-3. 编辑 `.env.local`，填入 Gemini API Key：
+3. 编辑 `.env.local`，配置本地模型：
 
 ```env
-GEMINI_API_KEY="your_gemini_api_key"
+OLLAMA_BASE_URL="http://localhost:11434"
+OLLAMA_MODEL="qwen2.5:7b"
 APP_URL="http://localhost:3000"
+```
+
+请确保 Ollama 已启动，并已拉取对应模型：
+
+```bash
+ollama pull qwen2.5:7b
+ollama serve
 ```
 
 4. 启动开发服务：
@@ -155,13 +165,13 @@ npm run build
 NODE_ENV=production npm run dev
 ```
 
-部署时需要设置 `GEMINI_API_KEY`，并确保运行环境允许写入 SQLite 数据库文件。
+部署时需要设置 `OLLAMA_BASE_URL` 和 `OLLAMA_MODEL`，并确保运行环境允许写入 SQLite 数据库文件。
 
 ## 常见问题
 
-### Gemini API 无响应
+### 本地模型无响应
 
-请检查 `.env.local` 中的 `GEMINI_API_KEY` 是否正确，并确认运行环境可以访问 Gemini API。
+请检查 Ollama 是否正在运行，`.env.local` 中的 `OLLAMA_BASE_URL` 和 `OLLAMA_MODEL` 是否正确，并确认模型已拉取到本机。
 
 ### 系统状态显示 N/A
 

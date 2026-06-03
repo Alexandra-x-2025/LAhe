@@ -1,53 +1,23 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Loader2, ShieldCheck, AlertTriangle, Terminal as TerminalIcon } from "lucide-react";
-import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import { CommandSafety, ArchCommand } from "@/src/types";
 import { useLanguage } from "@/src/lib/i18n";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-const ARCH_SYSTEM_PROMPT = `You are LAhe, an Arch Linux AI assistant. Your goal is to help users manage their Arch Linux system.
-Always provide commands using standard Arch Linux tools (pacman, systemctl, journalctl, ip, etc.).
-
-For every request that involves a command, you MUST return a response that includes one or more command blocks.
-Also, classify the safety of the command:
-- SOFT: Informational or read-only (e.g., ip addr, pacman -Qs)
-- MODERATE: System changes that require confirmation (e.g., pacman -S, systemctl start)
-- CRITICAL: Destructive or highly sensitive changes (e.g., rm -rf, mkfs, dd, modifying /etc/fstab)
-
-SELF-GROWTH CAPABILITIES:
-- If you learn something important about the user's setup (e.g. hostnames, specialized hardware, user preferences), you can save a "Memory Node".
-- If you find a recurring complex workflow that can be simplified, you can save a "Skill".
-
-FORMATS:
-- [AUDIT]: {"command": "...", "safety": "...", "explanation": "..."}
-- [MEMORY]: {"category": "...", "content": "...", "importance": 1-5} [OPTIONAL]
-- [SKILL]: {"name": "...", "pattern": "...", "commands": "..."} [OPTIONAL]
-
-IMPORTANT: Please respond in the same language as the user's request (English or Chinese).`;
+type ConsoleMessage = {
+  role: "user" | "ai";
+  content: string;
+  audits?: ArchCommand[];
+};
 
 export default function Console() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string; audit?: ArchCommand }[]>([]);
+  const [messages, setMessages] = useState<ConsoleMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { t, language } = useLanguage();
-
-  const [memoryContext, setMemoryContext] = useState("");
-  const [skillsContext, setSkillsContext] = useState("");
-
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/memory").then(res => res.json()),
-      fetch("/api/skills").then(res => res.json())
-    ]).then(([m, s]) => {
-      if (Array.isArray(m)) setMemoryContext(JSON.stringify(m.slice(0, 5)));
-      if (Array.isArray(s)) setSkillsContext(JSON.stringify(s.slice(0, 5)));
-    });
-  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -64,57 +34,24 @@ export default function Console() {
     setIsLoading(true);
 
     try {
-      const fullPrompt = `${ARCH_SYSTEM_PROMPT}\n\nCURRENT CONTEXT:\nPersistent Memory: ${memoryContext}\nLearned Skills: ${skillsContext}`;
-
-      const result = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [...messages.map(m => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.content }] })), { role: "user", parts: [{ text: userMessage }] }],
-        config: {
-          systemInstruction: fullPrompt,
-        },
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMessage,
+          messages: messages.map(({ role, content }) => ({ role, content })),
+        }),
       });
 
-      const responseText = result.text || (language === "en" ? "Sorry, I couldn't generate a response." : "抱歉，我无法生成回复。");
-      
-      // Parse technical blocks
-      let audit: ArchCommand | undefined;
-      let cleanText = responseText;
-
-      const auditMatch = responseText.match(/\[AUDIT\]:\s*(\{.*\})/);
-      if (auditMatch) {
-        try {
-          audit = JSON.parse(auditMatch[1]);
-          cleanText = cleanText.replace(/\[AUDIT\]:\s*\{.*\}/, "");
-        } catch (e) {}
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Local model request failed.");
       }
 
-      const memoryMatch = responseText.match(/\[MEMORY\]:\s*(\{.*\})/);
-      if (memoryMatch) {
-         try {
-           const mem = JSON.parse(memoryMatch[1]);
-           fetch("/api/memory", { 
-             method: "POST", 
-             headers: { "Content-Type": "application/json" },
-             body: JSON.stringify(mem) 
-           });
-           cleanText = cleanText.replace(/\[MEMORY\]:\s*\{.*\}/, "");
-         } catch (e) {}
-      }
+      const cleanText = data.reply || (language === "en" ? "Sorry, I couldn't generate a response." : "抱歉，我无法生成回复。");
+      const audits = Array.isArray(data.commands) ? data.commands : [];
 
-      const skillMatch = responseText.match(/\[SKILL\]:\s*(\{.*\})/);
-      if (skillMatch) {
-        try {
-          const skill = JSON.parse(skillMatch[1]);
-          fetch("/api/skills", { 
-            method: "POST", 
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(skill) 
-          });
-          cleanText = cleanText.replace(/\[SKILL\]:\s*\{.*\}/, "");
-        } catch (e) {}
-      }
-
-      setMessages((prev) => [...prev, { role: "ai", content: cleanText, audit }]);
+      setMessages((prev) => [...prev, { role: "ai", content: cleanText, audits }]);
 
       // Save to history in background
       fetch("/api/history", {
@@ -125,7 +62,7 @@ export default function Console() {
 
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages((prev) => [...prev, { role: "ai", content: language === "en" ? "Error communicating with the kernel (Gemini API). Please check your connection." : "与内核（Gemini API）通信时出错。请检查您的连接。" }]);
+      setMessages((prev) => [...prev, { role: "ai", content: language === "en" ? "Error communicating with the local model. Please check whether Ollama is running and the configured model is installed." : "与本地模型通信时出错。请检查 Ollama 是否正在运行，以及配置的模型是否已安装。" }]);
     } finally {
       setIsLoading(false);
     }
@@ -182,8 +119,9 @@ export default function Console() {
               </div>
             </div>
 
-            {msg.audit && (
+            {(msg.audits || []).map((audit, auditIndex) => (
               <motion.div 
+                key={`${i}-${auditIndex}`}
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full max-w-2xl bg-black border border-arch-border rounded-xl overflow-hidden shadow-2xl"
@@ -194,47 +132,66 @@ export default function Console() {
                   </div>
                   <span className={cn(
                     "text-[9px] font-bold px-2 py-0.5 rounded uppercase border",
-                    msg.audit.safety === CommandSafety.SOFT ? "bg-green-500/10 border-green-500/30 text-green-400" :
-                    msg.audit.safety === CommandSafety.MODERATE ? "bg-orange-500/10 border-orange-500/30 text-orange-400" :
+                    audit.safety === CommandSafety.SOFT ? "bg-green-500/10 border-green-500/30 text-green-400" :
+                    audit.safety === CommandSafety.MODERATE ? "bg-orange-500/10 border-orange-500/30 text-orange-400" :
                     "bg-red-500/10 border-red-500/30 text-red-500"
                   )}>
-                    {msg.audit.safety === CommandSafety.SOFT ? (language === "en" ? "Dry-Run Passed" : "模拟执行通过") : 
-                     msg.audit.safety === CommandSafety.MODERATE ? (language === "en" ? "Auth Required" : "需要授权") : (language === "en" ? "Restricted Access" : "受限访问")}
+                    {audit.safety === CommandSafety.SOFT ? (language === "en" ? "Read Only" : "只读命令") : 
+                     audit.safety === CommandSafety.MODERATE ? (language === "en" ? "Confirmation Required" : "需要确认") : (language === "en" ? "Blocked" : "已阻止")}
                   </span>
                 </div>
                 <div className="p-5 font-mono text-sm space-y-2 text-blue-300">
                   <div className="flex">
                     <span className="text-arch-blue mr-2">$</span>
-                    <span>{msg.audit.command}</span>
+                    <span>{audit.command}</span>
                   </div>
                   <div className="text-slate-500 text-[11px] italic mt-2">
-                    # {msg.audit.explanation}
+                    # {audit.explanation}
                   </div>
                 </div>
                 
-                {msg.audit.safety !== CommandSafety.SOFT && (
-                  <div className="bg-orange-500/5 border-t border-arch-border px-4 py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className="text-orange-500 shrink-0" size={18} />
-                      <div className="text-xs text-arch-text-secondary">
-                        <span className="font-bold text-orange-500">{t("console.audit.security")}</span> {t("console.audit.mod")}
-                      </div>
+                <div className={cn(
+                  "border-t border-arch-border px-4 py-3 flex items-center justify-between gap-4",
+                  audit.safety === CommandSafety.CRITICAL ? "bg-red-500/5" : "bg-orange-500/5"
+                )}>
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className={cn(
+                      "shrink-0",
+                      audit.safety === CommandSafety.CRITICAL ? "text-red-500" : "text-orange-500"
+                    )} size={18} />
+                    <div className="text-xs text-arch-text-secondary">
+                      <span className={cn(
+                        "font-bold",
+                        audit.safety === CommandSafety.CRITICAL ? "text-red-500" : "text-orange-500"
+                      )}>{t("console.audit.security")}</span> {audit.safety === CommandSafety.CRITICAL ? (language === "en" ? "Critical commands are blocked by the local safety gate." : "高危命令会被本地安全门阻止。") : t("console.audit.mod")}
                     </div>
-                    <div className="flex gap-2 shrink-0">
-                      <button 
-                        onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(msg.audit?.explanation || "")}`, "_blank")}
-                        className="px-3 py-1.5 hover:bg-slate-800 text-[10px] rounded-lg transition-colors border border-transparent hover:border-arch-border"
-                      >
-                        {t("console.audit.diff")}
-                      </button>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button 
+                      onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(audit.explanation || "")}`, "_blank")}
+                      className="px-3 py-1.5 hover:bg-slate-800 text-[10px] rounded-lg transition-colors border border-transparent hover:border-arch-border"
+                    >
+                      {t("console.audit.diff")}
+                    </button>
+                    {audit.safety !== CommandSafety.CRITICAL && (
                       <button 
                         onClick={async () => {
-                          if (!msg.audit?.command) return;
+                          if (!audit.command) return;
+                          if (audit.safety === CommandSafety.MODERATE) {
+                            const confirmed = window.confirm(language === "en"
+                              ? `Execute this system-changing command?\n\n${audit.command}`
+                              : `确认执行这条可能修改系统状态的命令吗？\n\n${audit.command}`);
+                            if (!confirmed) return;
+                          }
                           try {
                             const res = await fetch("/api/execute", {
                               method: "POST",
                               headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ command: msg.audit.command })
+                              body: JSON.stringify({ 
+                                command: audit.command,
+                                safety: audit.safety,
+                                confirmed: audit.safety === CommandSafety.MODERATE,
+                              })
                             });
                             const data = await res.json();
                             if (data.error) throw new Error(data.error);
@@ -254,11 +211,11 @@ export default function Console() {
                       >
                         {t("console.audit.execute")}
                       </button>
-                    </div>
+                    )}
                   </div>
-                )}
+                </div>
               </motion.div>
-            )}
+            ))}
           </motion.div>
         ))}
 

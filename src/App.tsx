@@ -8,6 +8,7 @@ import { Terminal, Database, Activity, History, ShieldAlert, Cpu, HardDrive, Inf
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import Console from "@/src/components/Console";
+import AuditView from "@/src/components/AuditView";
 import HistoryView from "@/src/components/HistoryView";
 import LogViewer from "@/src/components/LogViewer";
 import SystemStats from "@/src/components/SystemStats";
@@ -15,7 +16,7 @@ import NeuralMap from "@/src/components/NeuralMap";
 import Scheduler from "@/src/components/Scheduler";
 import { useLanguage } from "@/src/lib/i18n";
 
-type View = "console" | "history" | "logs" | "stats" | "skills" | "cron";
+type View = "console" | "history" | "audit" | "logs" | "stats" | "skills" | "cron";
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>("console");
@@ -25,6 +26,7 @@ export default function App() {
   const navItems = [
     { id: "console", label: t("nav.console"), icon: Terminal },
     { id: "history", label: t("nav.history"), icon: History },
+    { id: "audit", label: t("nav.audit"), icon: ShieldAlert },
     { id: "logs", label: t("nav.logs"), icon: Database },
     { id: "stats", label: t("nav.stats"), icon: Activity },
     { id: "skills", label: t("nav.skills"), icon: Brain },
@@ -151,6 +153,7 @@ export default function App() {
             >
               {activeView === "console" && <Console />}
               {activeView === "history" && <HistoryView />}
+              {activeView === "audit" && <AuditView />}
               {activeView === "logs" && <LogViewer />}
               {activeView === "stats" && <SystemStats />}
               {activeView === "skills" && <NeuralMap />}

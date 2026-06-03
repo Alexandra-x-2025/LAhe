@@ -49,3 +49,16 @@ export interface CronJob {
   last_run: string | null;
   status: "active" | "disabled";
 }
+
+export interface CommandExecution {
+  id: number;
+  command: string;
+  safety: CommandSafety;
+  confirmed: 0 | 1;
+  blocked: 0 | 1;
+  stdout: string;
+  stderr: string;
+  error: string;
+  exit_code: number | null;
+  timestamp: string;
+}
