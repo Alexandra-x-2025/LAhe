@@ -1,10 +1,72 @@
+# Dependencies
 node_modules/
-build/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
 dist/
+build/
+out/
+.vite/
+
+# Testing
 coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
+.nyc_output/
+*.test.ts.snap
+*.test.tsx.snap
+
+# Database (local runtime data)
 lahe.db
 lahe.db-*
+*.db-shm
+*.db-wal
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Claude Code (AI assistant session data)
+.claude/
+.claude.memory
+MEMORY.md
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
