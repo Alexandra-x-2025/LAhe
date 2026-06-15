@@ -6,6 +6,7 @@ import { historyRoutes } from "./routes/historyRoutes";
 import { memoryRoutes } from "./routes/memoryRoutes";
 import { skillRoutes } from "./routes/skillRoutes";
 import { systemRoutes } from "./routes/systemRoutes";
+import ollamaRoutes from "./routes/ollamaRoutes";
 
 export function createApp() {
   const app = express();
@@ -18,6 +19,7 @@ export function createApp() {
   app.use("/api/memory", memoryRoutes);
   app.use("/api/skills", skillRoutes);
   app.use("/api/cron", cronRoutes);
+  app.use("/api/ollama", ollamaRoutes);
 
   return app;
 }

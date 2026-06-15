@@ -14,6 +14,7 @@ import LogViewer from "@/src/components/LogViewer";
 import SystemStats from "@/src/components/SystemStats";
 import NeuralMap from "@/src/components/NeuralMap";
 import Scheduler from "@/src/components/Scheduler";
+import OllamaSettings from "@/src/components/OllamaSettings";
 import { useLanguage } from "@/src/lib/i18n";
 
 type View = "console" | "history" | "audit" | "logs" | "stats" | "skills" | "cron";
@@ -138,6 +139,9 @@ export default function App() {
                 root
               </div>
             </div>
+
+            {/* Ollama Settings */}
+            <OllamaSettings />
           </div>
         </header>
 
