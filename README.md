@@ -63,6 +63,30 @@
 
 ## 快速开始
 
+### 方式一：自动安装（推荐）
+
+**Linux / macOS:**
+```bash
+./install.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+.\install.ps1
+```
+
+安装脚本会自动：
+- 检查 Node.js 和 npm 版本
+- 安装项目依赖
+- 检测/安装 Ollama
+- 下载推荐模型（可选）
+- 创建环境变量文件
+- 构建项目
+
+---
+
+### 方式二：手动安装
+
 1. 安装依赖：
 
 ```bash
