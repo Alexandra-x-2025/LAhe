@@ -8,6 +8,7 @@ import { skillRoutes } from "./routes/skillRoutes";
 import { systemRoutes } from "./routes/systemRoutes";
 import ollamaRoutes from "./routes/ollamaRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import healthRoutes from "./routes/healthRoutes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 
 export function createApp() {
@@ -15,6 +16,9 @@ export function createApp() {
 
   // JSON 解析
   app.use(express.json());
+
+  // 健康检查端点（不需要 /api 前缀）
+  app.use("/health", healthRoutes);
 
   // API 路由
   app.use("/api/chat", chatRoutes);
