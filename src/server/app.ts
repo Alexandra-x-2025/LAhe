@@ -8,11 +8,15 @@ import { skillRoutes } from "./routes/skillRoutes";
 import { systemRoutes } from "./routes/systemRoutes";
 import ollamaRoutes from "./routes/ollamaRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 
 export function createApp() {
   const app = express();
 
+  // JSON 解析
   app.use(express.json());
+
+  // API 路由
   app.use("/api/chat", chatRoutes);
   app.use("/api/execute", commandRoutes);
   app.use("/api", systemRoutes);
@@ -22,6 +26,12 @@ export function createApp() {
   app.use("/api/cron", cronRoutes);
   app.use("/api/ollama", ollamaRoutes);
   app.use("/api/settings", settingsRoutes);
+
+  // 404 处理
+  app.use(notFoundHandler);
+
+  // 错误处理（必须在所有路由之后）
+  app.use(errorHandler);
 
   return app;
 }
