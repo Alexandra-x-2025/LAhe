@@ -75,7 +75,7 @@ const translations: Translations = {
   "ollama.models.size": { en: "Size", zh: "大小" },
   "ollama.models.family": { en: "Family", zh: "家族" },
   "ollama.config.save": { en: "Save Configuration", zh: "保存配置" },
-  "ollama.config.success": { en: "Configuration saved! Restart the service to apply changes.", zh: "配置已保存！重启服务以应用更改。" },
+  "ollama.config.success": { en: "Configuration saved successfully and applied immediately.", zh: "配置已保存并立即生效！" },
   "ollama.config.error": { en: "Failed to save configuration", zh: "保存配置失败" },
   "ollama.recommend": { en: "Recommended Models", zh: "推荐模型" },
   "ollama.reinstall.ollama": { en: "Ollama Not Installed", zh: "未安装 Ollama" },

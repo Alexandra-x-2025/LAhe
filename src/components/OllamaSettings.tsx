@@ -117,7 +117,7 @@ export default function OllamaSettings() {
         throw new Error(data.error || "Connection failed");
       }
 
-      setSuccessMessage(language === "en" ? "Configuration saved! Restart the service to apply changes." : "配置已保存！重启服务以应用更改。");
+      setSuccessMessage(t("ollama.config.success"));
       await checkStatus();
 
       setTimeout(() => setSuccessMessage(""), 5000);

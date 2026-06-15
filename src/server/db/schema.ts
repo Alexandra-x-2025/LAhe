@@ -47,5 +47,13 @@ export function initializeSchema() {
       exit_code INTEGER,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key TEXT UNIQUE NOT NULL,
+      value TEXT NOT NULL,
+      category TEXT DEFAULT 'general',
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 }

@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { checkOllamaStatus, listOllamaModels, getOllamaConfig } from "../services/ollamaClient";
 import { logger } from "../logger";
+import { upsertSetting } from "../db/repositories/settingsRepository";
+import { updateOllamaConfig } from "../config";
 
 const router = Router();
 
@@ -102,17 +104,19 @@ router.post("/config", async (req, res) => {
       });
     }
 
-    // 在开发模式下，我们可以动态更新环境变量
-    // 生产环境应通过 .env.local 配置
-    process.env.OLLAMA_BASE_URL = baseUrl;
-    process.env.OLLAMA_MODEL = model;
+    // 保存配置到数据库（持久化）
+    upsertSetting("ollama.baseUrl", baseUrl);
+    upsertSetting("ollama.model", model);
+
+    // 更新运行时配置
+    updateOllamaConfig(baseUrl, model);
 
     logger.info(`Ollama config updated: ${baseUrl} / ${model}`);
 
     res.json({
       success: true,
       config: { baseUrl, model },
-      message: "Configuration updated. Restart the service to apply changes.",
+      message: "Configuration saved successfully and applied immediately.",
     });
   } catch (error) {
     logger.error({ error }, "Failed to update config");

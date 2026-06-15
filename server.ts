@@ -2,13 +2,16 @@ import "./src/server/loadEnv";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import { config } from "./src/server/config";
+import { config, loadSettingsFromDatabase } from "./src/server/config";
 import { initializeSchema } from "./src/server/db/schema";
 import { logger } from "./src/server/logger";
 import { createApp } from "./src/server/app";
 
 async function startServer() {
   initializeSchema();
+
+  // 从数据库加载设置
+  await loadSettingsFromDatabase();
 
   const app = createApp();
 

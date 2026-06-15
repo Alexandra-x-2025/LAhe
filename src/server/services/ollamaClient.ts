@@ -1,4 +1,4 @@
-import { config } from "../config";
+import { config, updateOllamaConfig } from "../config";
 
 export interface OllamaMessage {
   role: "system" | "user" | "assistant";
